@@ -1,6 +1,6 @@
 <template>
   <VAppBar>
-    <span @click="navigateTo('/')">{{ title }}</span>
+    <span class="pointer" @click="navigateTo('/')">{{ title }}</span>
   </VAppBar>
 </template>
 
@@ -16,5 +16,7 @@ const props = defineProps({
 </script>
 
 <style scoped>
-
+.pointer {
+  cursor: pointer;
+}
 </style>

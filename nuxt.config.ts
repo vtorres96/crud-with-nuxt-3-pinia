@@ -14,6 +14,9 @@ export default defineNuxtConfig({
   runtimeConfig:{
     MONGO_URI: process.env.MONGO_URI
   },
+  plugins: [
+    '~/plugins/toasties.ts',
+  ],
   imports:{
     dirs:['stores']
   }

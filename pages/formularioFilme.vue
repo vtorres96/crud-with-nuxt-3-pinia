@@ -2,10 +2,10 @@
   <VContainer class="centrar">
     <VCard width="450" class="ma-auto">
       <VCardTitle class="text-center">
-        {{ titulo }} FIlme Favorito
+        {{ titulo }} Filme Favorito
       </VCardTitle>
       <VCardText>
-        <VForm @submit.prevent="procesarFormulario">
+        <VForm @submit.prevent="processarFormulario">
           <VTextField
             label="Titulo"
             v-model="campos.titulo"
@@ -34,40 +34,61 @@
       </VCardText>
     </VCard>
   </VContainer>
+
+  <VSnackbar v-model="snackbar" :timeout="3000" color="info">
+    {{ snackbarMessage }}
+  </VSnackbar>
 </template>
 
 <script setup lang="ts">
+import { ref, reactive, computed, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useNuxtApp } from '#app';
+
+const { $toasties } = useNuxtApp();
 
 const carregando = ref(false);
-const filmeStore = useFilmeStore()
-const {cadastrar, atualizar, setFilmeAtual} = filmeStore
-const {filmeAtual} = storeToRefs(filmeStore)
+const filmeStore = useFilmeStore();
+const { cadastrar, atualizar, setFilmeAtual } = filmeStore;
+const { filmeAtual } = storeToRefs(filmeStore);
 
 const campos = reactive({
   titulo: filmeAtual.value ? filmeAtual.value.titulo : '',
   sinopse: filmeAtual.value ? filmeAtual.value.sinopse : '',
-})
+});
 
-const procesarFormulario = async()=>{
+const processarFormulario = async () => {
   carregando.value = true;
-  if(filmeAtual.value){
-    await atualizar({...campos, _id: filmeAtual.value._id})
-  }else{
-    await cadastrar(campos)
+  let acao = filmeAtual.value ? 'atualizado' : 'adicionado';
+  try {
+    if (filmeAtual.value) {
+      await atualizar({ ...campos, _id: filmeAtual.value._id });
+    } else {
+      await cadastrar(campos);
+    }
+    $toasties.notificar(`Item ${acao} com sucesso`);
+    resetarCampos();
+  } catch (error) {
+    $toasties.notificar('Erro ao processar o formulário');
+  } finally {
+    carregando.value = false;
   }
-  carregando.value = false;
-}
+};
 
-const titulo = computed(()=> filmeAtual.value ? 'Editar' : 'Cadastrar')
+const resetarCampos = () => {
+  campos.titulo = '';
+  campos.sinopse = '';
+};
 
-onUnmounted(()=>{
-  setFilmeAtual(null)
-})
+const titulo = computed(() => filmeAtual.value ? 'Editar' : 'Cadastrar');
+
+onUnmounted(() => {
+  setFilmeAtual(null);
+});
 </script>
 
 <style scoped>
-.centrar{
+.centrar {
   display: flex;
   align-items: center;
   height: 80vh;

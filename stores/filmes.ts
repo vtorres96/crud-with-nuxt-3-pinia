@@ -21,14 +21,12 @@ export const useFilmeStore = defineStore('filmes', {
         method: 'POST',
         body
       })
-      navigateTo('/')      
     },
     async atualizar(body:IFilme){
       const {data, error} = await useFetch('/api/atualizar-filme',{
         method: 'PATCH',
         body
       })
-      navigateTo('/')      
     },
     async remover(id:string){
       const {data, error} = await useFetch(`/api/remover-filme/${id}`,{
