@@ -60,7 +60,7 @@
       </VCard>
     </VDialog>
   </VContainer>
-  <VSnackbar v-model="snackbar" :timeout="3000" color="info">
+  <VSnackbar v-model="snackbar" :timeout="1000" color="info">
     {{ snackbarMessage }}
   </VSnackbar>
 </template>
@@ -71,10 +71,11 @@ import { useNuxtApp } from '#app';
 import { storeToRefs } from 'pinia';
 
 const { $toasties } = useNuxtApp();
-
 const filmeStore = useFilmeStore();
 const { obterFilmes, remover, setFilmeAtual } = filmeStore;
 const { filmes } = storeToRefs(filmeStore);
+const snackbar = $toasties.snackbar;
+const snackbarMessage = $toasties.snackbarMessage;
 
 await obterFilmes();
 
@@ -92,10 +93,10 @@ const confirmarExclusao = async () => {
       await remover(itemAtual.value._id);
       modalAberto.value = false;
       await nextTick();
-      $toasties.notificar('Item removido com sucesso');
+      $toasties.notificar('Item removido com sucesso', { type: 'success' });
     } catch (error) {
       await nextTick();
-      $toasties.notificar('Erro ao remover o item');
+      $toasties.notificar('Erro ao remover o item', { type: 'error' });
     }
   }
 };

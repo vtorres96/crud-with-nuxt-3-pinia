@@ -12,10 +12,14 @@ export default defineNuxtPlugin(nuxtApp => {
     snackbarMessage.value = message;
     snackbar.value = true;
   };
-
-  const notificar = (message: string, options = {}) => {
+    
+  const notificar = (
+    message: string,
+    options: any = {}
+  ) => {
+    const delay = options.delay ?? 500
     toast(message, {
-      delay: 600,
+      delay: delay,
       position: toast.POSITION.BOTTOM_CENTER,
       ...options,
     });

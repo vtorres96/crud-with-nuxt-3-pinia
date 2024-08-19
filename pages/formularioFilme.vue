@@ -9,10 +9,12 @@
           <VTextField
             label="Titulo"
             v-model="campos.titulo"
+            required
           />
           <VTextField
             label="Sinopse"
             v-model="campos.sinopse"
+            required
           />
           <VBtn 
             variant="tonal"
@@ -34,8 +36,7 @@
       </VCardText>
     </VCard>
   </VContainer>
-
-  <VSnackbar v-model="snackbar" :timeout="3000" color="info">
+  <VSnackbar v-model="snackbar" :timeout="1000" color="info">
     {{ snackbarMessage }}
   </VSnackbar>
 </template>
@@ -46,18 +47,29 @@ import { storeToRefs } from 'pinia';
 import { useNuxtApp } from '#app';
 
 const { $toasties } = useNuxtApp();
-
 const carregando = ref(false);
 const filmeStore = useFilmeStore();
 const { cadastrar, atualizar, setFilmeAtual } = filmeStore;
 const { filmeAtual } = storeToRefs(filmeStore);
+const snackbar = $toasties.snackbar;
+const snackbarMessage = $toasties.snackbarMessage;
 
 const campos = reactive({
   titulo: filmeAtual.value ? filmeAtual.value.titulo : '',
   sinopse: filmeAtual.value ? filmeAtual.value.sinopse : '',
 });
 
+const validarCamposFormulario = () => {
+  if (!campos.titulo.trim() || !campos.sinopse.trim()) {
+    $toasties.notificar('Por favor, preencha todos os campos obrigatórios', { type: 'error' });
+    return false;
+  }
+  return true;
+};
+
 const processarFormulario = async () => {
+  if (!validarCamposFormulario())
+    return;
   carregando.value = true;
   let acao = filmeAtual.value ? 'atualizado' : 'adicionado';
   try {
@@ -66,10 +78,10 @@ const processarFormulario = async () => {
     } else {
       await cadastrar(campos);
     }
-    $toasties.notificar(`Item ${acao} com sucesso`);
+    $toasties.notificar(`Item ${acao} com sucesso`, { type: 'success' });
     resetarCampos();
   } catch (error) {
-    $toasties.notificar('Erro ao processar o formulário');
+    $toasties.notificar('Erro ao processar o formulário', { type: 'error' });
   } finally {
     carregando.value = false;
   }
