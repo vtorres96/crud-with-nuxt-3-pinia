@@ -1,9 +1,16 @@
 import { Filme } from '~/server/models/filme.model';
 
 export default defineEventHandler(async (event) => {
-  // const body = await readBody(event)
-  // return { body }
-  return {
-    filmes: await Filme.find()
+  try {
+    const filmes = await Filme.find()
+    return {
+      filmes
+    }
+  } catch (error: any) {
+    console.error(error.message);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erro interno do servidor',
+    })
   }
 })
