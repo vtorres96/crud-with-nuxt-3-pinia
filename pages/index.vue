@@ -8,7 +8,7 @@
         />
       </VCol>
     </VRow>
-    <VRow v-if="filmes.length > 0">
+    <VRow v-if="filmes && filmes.length > 0">
       <VCol>
         <VTable>
           <thead>
@@ -94,7 +94,7 @@ const confirmarExclusao = async () => {
       modalAberto.value = false;
       await nextTick();
       $toasties.notificar('Item removido com sucesso', { type: 'success' });
-    } catch (error) {
+    } catch (error: any) {
       await nextTick();
       $toasties.notificar('Erro ao remover o item', { type: 'error' });
     }
