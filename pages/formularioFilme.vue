@@ -71,7 +71,7 @@ const validarCamposFormulario = () => {
 
 const processarFormulario = async () => {
   if (carregando.value || !validarCamposFormulario())
-    return;
+    return false;
 
   carregando.value = true;
   
