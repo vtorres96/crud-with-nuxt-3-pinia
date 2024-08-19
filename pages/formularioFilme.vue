@@ -10,18 +10,20 @@
             label="Titulo"
             v-model="campos.titulo"
             required
+            :disabled="carregando"
           />
           <VTextField
             label="Sinopse"
             v-model="campos.sinopse"
             required
+            :disabled="carregando"
           />
           <VBtn 
             variant="tonal"
             type="submit"
             :loading="carregando"
             block>
-            Salvar
+            {{ carregando ? 'Processando...' : 'Salvar' }}
           </VBtn>
           <VBtn 
             class="mt-2"
@@ -68,22 +70,27 @@ const validarCamposFormulario = () => {
 };
 
 const processarFormulario = async () => {
-  if (!validarCamposFormulario())
+  if (carregando.value || !validarCamposFormulario())
     return;
+
   carregando.value = true;
-  let acao = filmeAtual.value ? 'atualizado' : 'adicionado';
+  
   try {
     if (filmeAtual.value) {
       await atualizar({ ...campos, _id: filmeAtual.value._id });
     } else {
       await cadastrar(campos);
     }
-    $toasties.notificar(`Item ${acao} com sucesso`, { type: 'success' });
-    resetarCampos();
-  } catch (error) {
+    await nextTick();
+    $toasties.notificar(`Item processado com sucesso`, { type: 'success' });
+  } catch (error: any) {
+    await nextTick();
     $toasties.notificar('Erro ao processar o formulário', { type: 'error' });
   } finally {
-    carregando.value = false;
+    setTimeout(() => {
+      carregando.value = false;
+      // resetarCampos();
+    }, 500);
   }
 };
 
@@ -91,6 +98,12 @@ const resetarCampos = () => {
   campos.titulo = '';
   campos.sinopse = '';
 };
+
+// watch(carregando, (novoValor) => {
+//   if (!novoValor) {
+//     resetarCampos();
+//   }
+// });
 
 const titulo = computed(() => filmeAtual.value ? 'Editar' : 'Cadastrar');
 
